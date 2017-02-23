@@ -1,0 +1,51 @@
+{
+  "name": "unified-stream",
+  "version": "0.0.0",
+  "description": "Streaming interface for unified processors",
+  "license": "MIT",
+  "keywords": [
+    "unified",
+    "stream"
+  ],
+  "repository": "https://github.com/unifiedjs/unified-stream",
+  "bugs": "https://github.com/unifiedjs/unified-stream/issues",
+  "author": "Titus Wormer <tituswormer@gmail.com> (http://wooorm.com)",
+  "contributors": [
+    "Titus Wormer <tituswormer@gmail.com> (http://wooorm.com)"
+  ],
+  "files": [
+    "index.js"
+  ],
+  "dependencies": {
+    "is-function": "^1.0.1",
+    "once": "^1.4.0"
+  },
+  "devDependencies": {
+    "nyc": "^10.1.0",
+    "remark-cli": "^2.0.0",
+    "remark-preset-wooorm": "^1.0.0",
+    "tape": "^4.6.3",
+    "unified": "^6.0.0",
+    "xo": "^0.17.1"
+  },
+  "scripts": {
+    "build-md": "remark . -qfo",
+    "build": "npm run build-md",
+    "lint": "xo",
+    "test-api": "node test",
+    "test-coverage": "nyc --reporter lcov tape test.js",
+    "test": "npm run build && npm run lint && npm run test-coverage"
+  },
+  "nyc": {
+    "check-coverage": true,
+    "lines": 100,
+    "functions": 100,
+    "branches": 100
+  },
+  "xo": {
+    "space": true
+  },
+  "remarkConfig": {
+    "presets": "wooorm"
+  }
+}
