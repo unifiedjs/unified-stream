@@ -21,12 +21,12 @@
     "once": "^1.4.0"
   },
   "devDependencies": {
-    "nyc": "^10.1.0",
-    "remark-cli": "^2.0.0",
-    "remark-preset-wooorm": "^1.0.0",
+    "nyc": "^11.0.0",
+    "remark-cli": "^3.0.0",
+    "remark-preset-wooorm": "^3.0.0",
     "tape": "^4.6.3",
     "unified": "^6.0.0",
-    "xo": "^0.17.1"
+    "xo": "^0.18.0"
   },
   "scripts": {
     "build-md": "remark . -qfo",
@@ -43,9 +43,15 @@
     "branches": 100
   },
   "xo": {
-    "space": true
+    "space": true,
+    "esnext": false,
+    "rules": {
+      "unicorn/no-new-buffer": "off"
+    }
   },
   "remarkConfig": {
-    "presets": "wooorm"
+    "plugins": [
+      "preset-wooorm"
+    ]
   }
 }

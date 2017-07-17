@@ -53,7 +53,7 @@ test('createStream', function (t) {
       .on('data', function (value) {
         st.equal(value, 'brC!vo', 'should honour encoding');
       })
-      .end(new Buffer([0x62, 0x72, 0xc3, 0xa1, 0x76, 0x6f]), 'ascii');
+      .end(new Buffer([0x62, 0x72, 0xC3, 0xA1, 0x76, 0x6F]), 'ascii');
 
     phase = 0;
 

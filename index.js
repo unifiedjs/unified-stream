@@ -12,7 +12,8 @@ function stream(processor) {
   var ended = false;
 
   emitter.processor = processor;
-  emitter.readable = emitter.writable = true;
+  emitter.readable = true;
+  emitter.writable = true;
   emitter.write = write;
   emitter.end = end;
   emitter.pipe = pipe;
