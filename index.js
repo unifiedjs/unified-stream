@@ -2,7 +2,6 @@
 
 var events = require('events');
 var once = require('once');
-var func = require('is-function');
 
 module.exports = stream;
 
@@ -22,7 +21,7 @@ function stream(processor) {
 
   /* Write a chunk into memory. */
   function write(chunk, encoding, callback) {
-    if (func(encoding)) {
+    if (typeof encoding === 'function') {
       callback = encoding;
       encoding = null;
     }

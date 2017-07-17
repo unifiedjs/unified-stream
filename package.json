@@ -17,10 +17,10 @@
     "index.js"
   ],
   "dependencies": {
-    "is-function": "^1.0.1",
     "once": "^1.4.0"
   },
   "devDependencies": {
+    "is-function": "^1.0.1",
     "nyc": "^11.0.0",
     "remark-cli": "^3.0.0",
     "remark-preset-wooorm": "^3.0.0",
