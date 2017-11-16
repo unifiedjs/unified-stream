@@ -7,7 +7,7 @@
     "unified",
     "stream"
   ],
-  "repository": "https://github.com/unifiedjs/unified-stream",
+  "repository": "unifiedjs/unified-stream",
   "bugs": "https://github.com/unifiedjs/unified-stream/issues",
   "author": "Titus Wormer <tituswormer@gmail.com> (http://wooorm.com)",
   "contributors": [
