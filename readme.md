@@ -1,6 +1,6 @@
 # unified-stream [![Build Status][travis-badge]][travis] [![Coverage Status][codecov-badge]][codecov]
 
-Module to add a streaming interface to [unified][] processors.
+Streaming interface to [unified][] processors.
 
 Note that the interface is streaming, but the code buffers.
 
