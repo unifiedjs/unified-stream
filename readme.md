@@ -32,6 +32,14 @@ process.stdin
 
 Create a readable/writable stream that transforms with `processor`.
 
+## Contribute
+
+See [`contribute.md` in `unifiedjs/unified`][contribute] for ways to get
+started.
+
+This organisation has a [Code of Conduct][coc].  By interacting with this
+repository, organisation, or community you agree to abide by its terms.
+
 ## License
 
 [MIT][license] © [Titus Wormer][author]
@@ -53,3 +61,7 @@ Create a readable/writable stream that transforms with `processor`.
 [author]: http://wooorm.com
 
 [unified]: https://github.com/unifiedjs/unified
+
+[contribute]: https://github.com/unifiedjs/unified/blob/master/contributing.md
+
+[coc]: https://github.com/unifiedjs/unified/blob/master/code-of-conduct.md
