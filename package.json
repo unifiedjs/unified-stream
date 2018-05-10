@@ -26,8 +26,8 @@
     "remark-cli": "^5.0.0",
     "remark-preset-wooorm": "^4.0.0",
     "tape": "^4.6.3",
-    "unified": "^6.0.0",
-    "xo": "^0.20.0"
+    "unified": "^7.0.0",
+    "xo": "^0.21.0"
   },
   "scripts": {
     "format": "remark . -qfo && prettier --write '**/*.js' && xo --fix",
