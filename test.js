@@ -118,7 +118,7 @@ test('createStream', function(t) {
     st.plan(5)
 
     st.doesNotThrow(function() {
-      /* Not writable. */
+      // Not writable.
       var tr = createStream(proc)
       tr.pipe(new stream.Readable())
       tr.end('foo')
@@ -158,8 +158,7 @@ test('createStream', function(t) {
 
     tr = createStream(proc)
 
-    tr
-      .pipe(new stream.PassThrough())
+    tr.pipe(new stream.PassThrough())
       .on('data', function(buf) {
         st.equal(
           String(buf),

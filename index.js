@@ -19,7 +19,7 @@ function stream(processor) {
 
   return emitter
 
-  /* Write a chunk into memory. */
+  // Write a chunk into memory.
   function write(chunk, encoding, callback) {
     if (typeof encoding === 'function') {
       callback = encoding
@@ -36,16 +36,14 @@ function stream(processor) {
       callback()
     }
 
-    /* Signal succesful write. */
+    // Signal succesful write.
     return true
   }
 
-  /* End the writing.  Passes all arguments to a final
-   * `write`.  Starts the process, which will trigger
-   * `error`, with a fatal error, if any; `data`, with
-   * the generated document in `string` form, if
-   * succesful.  If messages are triggered during the
-   * process, those are triggerd as `warning`s. */
+  // End the writing.  Passes all arguments to a final `write`.  Starts the
+  // process, which will trigger `error`, with a fatal error, if any; `data`,
+  // with the generated document in `string` form, if succesful.  If messages
+  // are triggered during the process, those are triggerd as `warning`s.
   function end() {
     write.apply(null, arguments)
 
@@ -62,7 +60,7 @@ function stream(processor) {
 
       chunks = null
 
-      /* Trigger messages as warnings, except for fatal error. */
+      // Trigger messages as warnings, except for fatal error.
       while (++index < length) {
         /* istanbul ignore else - shouldn’t happen. */
         if (messages[index] !== err) {
@@ -71,7 +69,7 @@ function stream(processor) {
       }
 
       if (err) {
-        /* Don’t enter an infinite error throwing loop. */
+        // Don’t enter an infinite error throwing loop.
         global.setTimeout(function() {
           emitter.emit('error', err)
         }, 4)
@@ -82,12 +80,9 @@ function stream(processor) {
     }
   }
 
-  /* Pipe the processor into a writable stream.
-   *
-   * Basically `Stream#pipe`, but inlined and
-   * simplified to keep the bundled size down.
-   *
-   * See https://github.com/nodejs/node/blob/master/lib/stream.js#L26. */
+  // Pipe the processor into a writable stream.  Basically `Stream#pipe`, but
+  // inlined and simplified to keep the bundled size down.
+  // See <https://github.com/nodejs/node/blob/master/lib/stream.js#L26>.
   function pipe(dest, options) {
     var settings = options || {}
     var onend = once(onended)
@@ -97,9 +92,8 @@ function stream(processor) {
     emitter.on('end', cleanup)
     emitter.on('close', cleanup)
 
-    /* If the 'end' option is not supplied, dest.end() will be
-     * called when the 'end' or 'close' events are received.
-     * Only dest.end() once. */
+    // If the `end` option is not supplied, `dest.end()` will be called when the
+    // `end` or `close` events are received.  Only `dest.end()` once.
     if (!dest._isStdio && settings.end !== false) {
       emitter.on('end', onend)
     }
@@ -111,21 +105,21 @@ function stream(processor) {
 
     return dest
 
-    /* End destination. */
+    // End destination.
     function onended() {
       if (dest.end) {
         dest.end()
       }
     }
 
-    /* Handle data. */
+    // Handle data.
     function ondata(chunk) {
       if (dest.writable) {
         dest.write(chunk)
       }
     }
 
-    /* Clean listeners. */
+    // Clean listeners.
     function cleanup() {
       emitter.removeListener('data', ondata)
       emitter.removeListener('end', onend)
@@ -137,15 +131,15 @@ function stream(processor) {
       dest.removeListener('close', cleanup)
     }
 
-    /* Close dangling pipes and handle unheard errors. */
+    // Close dangling pipes and handle unheard errors.
     function onerror(err) {
       var handlers = emitter._events.error
 
       cleanup()
 
-      /* Cannot use `listenerCount` in node <= 0.12. */
+      // Cannot use `listenerCount` in node <= 0.12.
       if (!handlers || handlers.length === 0 || handlers === onerror) {
-        throw err /* Unhandled stream error in pipe. */
+        throw err // Unhandled stream error in pipe.
       }
     }
   }
