@@ -1,6 +1,6 @@
 {
   "name": "unified-stream",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Streaming interface for unified processors",
   "license": "MIT",
   "keywords": [
