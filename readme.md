@@ -49,13 +49,13 @@ repository, organisation, or community you agree to abide by its terms.
 
 <!-- Definitions -->
 
-[build-badge]: https://img.shields.io/travis/syntax-tree/unified-stream.svg
+[build-badge]: https://img.shields.io/travis/unifiedjs/unified-stream.svg
 
-[build]: https://travis-ci.org/syntax-tree/unified-stream
+[build]: https://travis-ci.org/unifiedjs/unified-stream
 
-[coverage-badge]: https://img.shields.io/codecov/c/github/syntax-tree/unified-stream.svg
+[coverage-badge]: https://img.shields.io/codecov/c/github/unifiedjs/unified-stream.svg
 
-[coverage]: https://codecov.io/github/syntax-tree/unified-stream
+[coverage]: https://codecov.io/github/unifiedjs/unified-stream
 
 [downloads-badge]: https://img.shields.io/npm/dm/unified-stream.svg
 
