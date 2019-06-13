@@ -40,10 +40,12 @@ function stream(processor) {
     return true
   }
 
-  // End the writing.  Passes all arguments to a final `write`.  Starts the
-  // process, which will trigger `error`, with a fatal error, if any; `data`,
-  // with the generated document in `string` form, if succesful.  If messages
-  // are triggered during the process, those are triggerd as `warning`s.
+  // End the writing.
+  // Passes all arguments to a final `write`.
+  // Starts the process, which will trigger `error`, with a fatal error, if any;
+  // `data`, with the generated document in `string` form, if succesful.
+  // If messages are triggered during the process, those are triggerd as
+  // `warning`s.
   function end() {
     write.apply(null, arguments)
 
@@ -80,9 +82,10 @@ function stream(processor) {
     }
   }
 
-  // Pipe the processor into a writable stream.  Basically `Stream#pipe`, but
-  // inlined and simplified to keep the bundled size down.
-  // See <https://github.com/nodejs/node/blob/master/lib/stream.js#L26>.
+  // Pipe the processor into a writable stream.
+  // Basically `Stream#pipe`, but inlined and simplified to keep the bundled
+  // size down.
+  // See: <https://github.com/nodejs/node/blob/43a5170/lib/internal/streams/legacy.js#L13>.
   function pipe(dest, options) {
     var settings = options || {}
     var onend = once(onended)
@@ -93,7 +96,8 @@ function stream(processor) {
     emitter.on('close', cleanup)
 
     // If the `end` option is not supplied, `dest.end()` will be called when the
-    // `end` or `close` events are received.  Only `dest.end()` once.
+    // `end` or `close` events are received
+    // Only `dest.end()` once.
     if (!dest._isStdio && settings.end !== false) {
       emitter.on('end', onend)
     }

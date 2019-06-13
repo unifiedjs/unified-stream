@@ -84,7 +84,8 @@ test('createStream', function(t) {
       })
       .on(
         'data',
-        /* istanbul ignore next */ function() {
+        /* istanbul ignore next */
+        function() {
           st.fail('should not trigger `data` if an error occurs')
         }
       )
@@ -168,7 +169,8 @@ test('createStream', function(t) {
       })
       .on(
         'error',
-        /* istanbul ignore next */ function() {
+        /* istanbul ignore next */
+        function() {
           st.fail('should not trigger `error`')
         }
       )
