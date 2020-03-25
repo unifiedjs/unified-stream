@@ -24,14 +24,14 @@
     "once": "^1.4.0"
   },
   "devDependencies": {
-    "is-function": "^1.0.1",
-    "nyc": "^14.0.0",
-    "prettier": "^1.0.0",
-    "remark-cli": "^6.0.0",
-    "remark-preset-wooorm": "^5.0.0",
+    "is-function": "^1.0.0",
+    "nyc": "^15.0.0",
+    "prettier": "^2.0.0",
+    "remark-cli": "^7.0.0",
+    "remark-preset-wooorm": "^6.0.0",
     "tape": "^4.0.0",
     "unified": "^8.0.0",
-    "xo": "^0.24.0"
+    "xo": "^0.28.0"
   },
   "scripts": {
     "format": "remark . -qfo && prettier --write \"**/*.js\" && xo --fix",
@@ -57,10 +57,7 @@
     "prettier": true,
     "esnext": false,
     "rules": {
-      "guard-for-in": "off",
-      "no-var": "off",
-      "prefer-arrow-callback": "off",
-      "unicorn/number-literal-case": "off"
+      "unicorn/prefer-reflect-apply": "off"
     }
   },
   "remarkConfig": {

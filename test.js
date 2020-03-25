@@ -6,12 +6,10 @@ var unified = require('unified')
 var func = require('is-function')
 var createStream = require('.')
 
-test('createStream', function(t) {
-  var proc = unified()
-    .use(parse)
-    .use(stringify)
+test('createStream', function (t) {
+  var proc = unified().use(parse).use(stringify)
 
-  t.test('interface', function(st) {
+  t.test('interface', function (st) {
     var tr = createStream(proc)
     st.equal(tr.readable, true, 'should be readable')
     st.equal(tr.writable, true, 'should be writable')
@@ -21,7 +19,7 @@ test('createStream', function(t) {
     st.end()
   })
 
-  t.test('#end and #write', function(st) {
+  t.test('#end and #write', function (st) {
     var phase
     var exception
 
@@ -30,7 +28,7 @@ test('createStream', function(t) {
     st.equal(createStream(proc).end(), true, 'should return true')
 
     st.throws(
-      function() {
+      function () {
         var tr = createStream(proc)
         tr.end()
         tr.end()
@@ -40,19 +38,19 @@ test('createStream', function(t) {
     )
 
     createStream(proc)
-      .on('data', function(value) {
+      .on('data', function (value) {
         st.equal(value, '', 'should emit processed `data`')
       })
       .end()
 
     createStream(proc)
-      .on('data', function(value) {
+      .on('data', function (value) {
         st.equal(value, 'alpha', 'should emit given `data`')
       })
       .end('alpha')
 
     createStream(proc)
-      .on('data', function(value) {
+      .on('data', function (value) {
         st.equal(value, 'brC!vo', 'should honour encoding')
       })
       .end(Buffer.from([0x62, 0x72, 0xc3, 0xa1, 0x76, 0x6f]), 'ascii')
@@ -60,11 +58,11 @@ test('createStream', function(t) {
     phase = 0
 
     createStream(proc)
-      .on('data', function() {
+      .on('data', function () {
         st.equal(phase, 1, 'should trigger data after callback')
         phase++
       })
-      .end('charlie', function() {
+      .end('charlie', function () {
         st.equal(phase, 0, 'should trigger callback before data')
         phase++
       })
@@ -72,53 +70,53 @@ test('createStream', function(t) {
     exception = new Error('alpha')
 
     createStream(
-      proc().use(function() {
+      proc().use(function () {
         return transformer
         function transformer() {
           return exception
         }
       })
     )
-      .on('error', function(err) {
+      .on('error', function (err) {
         st.equal(err, exception, 'should trigger `error` if an error occurs')
       })
       .on(
         'data',
         /* istanbul ignore next */
-        function() {
+        function () {
           st.fail('should not trigger `data` if an error occurs')
         }
       )
       .end()
 
     createStream(
-      proc().use(function() {
+      proc().use(function () {
         return transformer
         function transformer(tree, file) {
           file.message(exception)
         }
       })
     )
-      .on('warning', function(err) {
+      .on('warning', function (err) {
         st.equal(
           err.reason,
           'alpha',
           'should trigger `warning` if an messages are emitted'
         )
       })
-      .on('data', function(data) {
+      .on('data', function (data) {
         st.equal(data, '', 'should not fail if warnings are emitted')
       })
       .end()
   })
 
-  t.test('#pipe', function(st) {
+  t.test('#pipe', function (st) {
     var tr
     var s
 
     st.plan(5)
 
-    st.doesNotThrow(function() {
+    st.doesNotThrow(function () {
       // Not writable.
       var tr = createStream(proc)
       tr.pipe(new stream.Readable())
@@ -135,11 +133,11 @@ test('createStream', function(t) {
     tr.write('bravo')
     tr.end('charlie')
 
-    st.doesNotThrow(function() {
+    st.doesNotThrow(function () {
       s.write('delta')
     }, 'should not `end` stdio streams')
 
-    tr = createStream(proc).on('error', function(err) {
+    tr = createStream(proc).on('error', function (err) {
       st.equal(err.message, 'Whoops!', 'should pass errors')
     })
 
@@ -150,7 +148,7 @@ test('createStream', function(t) {
     tr.pipe(new stream.PassThrough())
 
     st.throws(
-      function() {
+      function () {
         tr.emit('error', new Error('Whoops!'))
       },
       /Whoops!/,
@@ -160,7 +158,7 @@ test('createStream', function(t) {
     tr = createStream(proc)
 
     tr.pipe(new stream.PassThrough())
-      .on('data', function(buf) {
+      .on('data', function (buf) {
         st.equal(
           String(buf),
           'alphabravocharlie',
@@ -170,7 +168,7 @@ test('createStream', function(t) {
       .on(
         'error',
         /* istanbul ignore next */
-        function() {
+        function () {
           st.fail('should not trigger `error`')
         }
       )

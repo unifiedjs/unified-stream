@@ -72,7 +72,7 @@ function stream(processor) {
 
       if (err) {
         // Don’t enter an infinite error throwing loop.
-        global.setTimeout(function() {
+        global.setTimeout(function () {
           emitter.emit('error', err)
         }, 4)
       } else {
