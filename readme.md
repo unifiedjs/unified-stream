@@ -53,9 +53,9 @@ abide by its terms.
 
 <!-- Definitions -->
 
-[build-badge]: https://img.shields.io/travis/unifiedjs/unified-stream.svg
+[build-badge]: https://github.com/unifiedjs/unified-stream/workflows/main/badge.svg
 
-[build]: https://travis-ci.org/unifiedjs/unified-stream
+[build]: https://github.com/unifiedjs/unified-stream/actions
 
 [coverage-badge]: https://img.shields.io/codecov/c/github/unifiedjs/unified-stream.svg
 
