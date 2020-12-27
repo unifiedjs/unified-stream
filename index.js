@@ -1,14 +1,14 @@
 'use strict'
 
+module.exports = stream
+
 var events = require('events')
 var once = require('once')
-
-module.exports = stream
 
 function stream(processor) {
   var chunks = []
   var emitter = new events.EventEmitter()
-  var ended = false
+  var ended
 
   emitter.processor = processor
   emitter.readable = true
@@ -57,13 +57,12 @@ function stream(processor) {
 
     function done(err, file) {
       var messages = file ? file.messages : []
-      var length = messages.length
       var index = -1
 
       chunks = null
 
       // Trigger messages as warnings, except for fatal error.
-      while (++index < length) {
+      while (++index < messages.length) {
         /* istanbul ignore else - shouldn’t happen. */
         if (messages[index] !== err) {
           emitter.emit('warning', messages[index])
@@ -72,7 +71,7 @@ function stream(processor) {
 
       if (err) {
         // Don’t enter an infinite error throwing loop.
-        global.setTimeout(function () {
+        setTimeout(function () {
           emitter.emit('error', err)
         }, 4)
       } else {
@@ -137,12 +136,14 @@ function stream(processor) {
 
     // Close dangling pipes and handle unheard errors.
     function onerror(err) {
-      var handlers = emitter._events.error
-
       cleanup()
 
       // Cannot use `listenerCount` in node <= 0.12.
-      if (!handlers || handlers.length === 0 || handlers === onerror) {
+      if (
+        !emitter._events.error ||
+        !emitter._events.error.length ||
+        emitter._events.error === onerror
+      ) {
         throw err // Unhandled stream error in pipe.
       }
     }
