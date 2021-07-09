@@ -2,9 +2,9 @@ import events from 'events'
 import once from 'once'
 
 export function stream(processor) {
-  var chunks = []
-  var emitter = new events.EventEmitter()
-  var ended
+  let chunks = []
+  const emitter = new events.EventEmitter()
+  let ended
 
   emitter.processor = processor
   emitter.readable = true
@@ -52,8 +52,8 @@ export function stream(processor) {
     return true
 
     function done(error, file) {
-      var messages = file ? file.messages : []
-      var index = -1
+      const messages = file ? file.messages : []
+      let index = -1
 
       chunks = null
 
@@ -67,7 +67,7 @@ export function stream(processor) {
 
       if (error) {
         // Don’t enter an infinite error throwing loop.
-        setTimeout(function () {
+        setTimeout(() => {
           emitter.emit('error', error)
         }, 4)
       } else {
@@ -82,8 +82,8 @@ export function stream(processor) {
   // size down.
   // See: <https://github.com/nodejs/node/blob/43a5170/lib/internal/streams/legacy.js#L13>.
   function pipe(dest, options) {
-    var settings = options || {}
-    var onend = once(onended)
+    const settings = options || {}
+    const onend = once(onended)
 
     emitter.on('data', ondata)
     emitter.on('error', onerror)
@@ -137,7 +137,7 @@ export function stream(processor) {
       // Cannot use `listenerCount` in node <= 0.12.
       if (
         !emitter._events.error ||
-        !emitter._events.error.length ||
+        emitter._events.error.length === 0 ||
         emitter._events.error === onerror
       ) {
         throw error // Unhandled stream error in pipe.
