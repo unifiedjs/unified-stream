@@ -13,6 +13,9 @@ Note that the interface is streaming, but the code buffers.
 
 ## Install
 
+This package is [ESM only](https://gist.github.com/sindresorhus/a39789f98801d908bbc7ff3ecc99d99c):
+Node 12+ is needed to use it and it must be `import`ed instead of `require`d.
+
 [npm][]:
 
 ```sh
@@ -33,7 +36,10 @@ process.stdin.pipe(stream(rehype().use(format))).pipe(process.stdout)
 
 ## API
 
-### `createStream(processor)`
+This package exports the following identifiers: `stream`.
+There is no default export.
+
+### `stream(processor)`
 
 Create a readable/writable stream that transforms with `processor`.
 

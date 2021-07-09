@@ -1,16 +1,14 @@
-'use strict'
+import nodeStream from 'stream'
+import test from 'tape'
+import unified from 'unified'
+import func from 'is-function'
+import {stream} from './index.js'
 
-var stream = require('stream')
-var test = require('tape')
-var unified = require('unified')
-var func = require('is-function')
-var createStream = require('.')
-
-test('createStream', function (t) {
+test('stream', function (t) {
   var proc = unified().use(parse).use(stringify)
 
   t.test('interface', function (st) {
-    var tr = createStream(proc)
+    var tr = stream(proc)
     st.equal(tr.readable, true, 'should be readable')
     st.equal(tr.writable, true, 'should be writable')
     st.ok(func(tr.write), 'should have a `write` method')
@@ -25,11 +23,11 @@ test('createStream', function (t) {
 
     st.plan(10)
 
-    st.equal(createStream(proc).end(), true, 'should return true')
+    st.equal(stream(proc).end(), true, 'should return true')
 
     st.throws(
       function () {
-        var tr = createStream(proc)
+        var tr = stream(proc)
         tr.end()
         tr.end()
       },
@@ -37,19 +35,19 @@ test('createStream', function (t) {
       'should throw on end after end'
     )
 
-    createStream(proc)
+    stream(proc)
       .on('data', function (value) {
         st.equal(value, '', 'should emit processed `data`')
       })
       .end()
 
-    createStream(proc)
+    stream(proc)
       .on('data', function (value) {
         st.equal(value, 'alpha', 'should emit given `data`')
       })
       .end('alpha')
 
-    createStream(proc)
+    stream(proc)
       .on('data', function (value) {
         st.equal(value, 'brC!vo', 'should honour encoding')
       })
@@ -57,7 +55,7 @@ test('createStream', function (t) {
 
     phase = 0
 
-    createStream(proc)
+    stream(proc)
       .on('data', function () {
         st.equal(phase, 1, 'should trigger data after callback')
         phase++
@@ -69,7 +67,7 @@ test('createStream', function (t) {
 
     exception = new Error('alpha')
 
-    createStream(
+    stream(
       proc().use(function () {
         return transformer
         function transformer() {
@@ -89,7 +87,7 @@ test('createStream', function (t) {
       )
       .end()
 
-    createStream(
+    stream(
       proc().use(function () {
         return transformer
         function transformer(tree, file) {
@@ -118,13 +116,13 @@ test('createStream', function (t) {
 
     st.doesNotThrow(function () {
       // Not writable.
-      var tr = createStream(proc)
-      tr.pipe(new stream.Readable())
+      var tr = stream(proc)
+      tr.pipe(new nodeStream.Readable())
       tr.end('foo')
     }, 'should not throw when piping to a non-writable stream')
 
-    tr = createStream(proc)
-    s = new stream.PassThrough()
+    tr = stream(proc)
+    s = new nodeStream.PassThrough()
     s._isStdio = true
 
     tr.pipe(s)
@@ -137,15 +135,15 @@ test('createStream', function (t) {
       s.write('delta')
     }, 'should not `end` stdio streams')
 
-    tr = createStream(proc).on('error', function (error) {
+    tr = stream(proc).on('error', function (error) {
       st.equal(error.message, 'Whoops!', 'should pass errors')
     })
 
-    tr.pipe(new stream.PassThrough())
+    tr.pipe(new nodeStream.PassThrough())
     tr.emit('error', new Error('Whoops!'))
 
-    tr = createStream(proc)
-    tr.pipe(new stream.PassThrough())
+    tr = stream(proc)
+    tr.pipe(new nodeStream.PassThrough())
 
     st.throws(
       function () {
@@ -155,9 +153,9 @@ test('createStream', function (t) {
       'should throw if errors are not listened to'
     )
 
-    tr = createStream(proc)
+    tr = stream(proc)
 
-    tr.pipe(new stream.PassThrough())
+    tr.pipe(new nodeStream.PassThrough())
       .on('data', function (buf) {
         st.equal(
           String(buf),

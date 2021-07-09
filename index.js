@@ -1,11 +1,7 @@
-'use strict'
+import events from 'events'
+import once from 'once'
 
-module.exports = stream
-
-var events = require('events')
-var once = require('once')
-
-function stream(processor) {
+export function stream(processor) {
   var chunks = []
   var emitter = new events.EventEmitter()
   var ended
@@ -47,7 +43,7 @@ function stream(processor) {
   // If messages are triggered during the process, those are triggerd as
   // `warning`s.
   function end() {
-    write.apply(null, arguments)
+    write(...arguments)
 
     ended = true
 
