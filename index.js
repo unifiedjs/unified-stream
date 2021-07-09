@@ -55,7 +55,7 @@ function stream(processor) {
 
     return true
 
-    function done(err, file) {
+    function done(error, file) {
       var messages = file ? file.messages : []
       var index = -1
 
@@ -64,15 +64,15 @@ function stream(processor) {
       // Trigger messages as warnings, except for fatal error.
       while (++index < messages.length) {
         /* istanbul ignore else - shouldn’t happen. */
-        if (messages[index] !== err) {
+        if (messages[index] !== error) {
           emitter.emit('warning', messages[index])
         }
       }
 
-      if (err) {
+      if (error) {
         // Don’t enter an infinite error throwing loop.
         setTimeout(function () {
-          emitter.emit('error', err)
+          emitter.emit('error', error)
         }, 4)
       } else {
         emitter.emit('data', file.contents)
@@ -135,7 +135,7 @@ function stream(processor) {
     }
 
     // Close dangling pipes and handle unheard errors.
-    function onerror(err) {
+    function onerror(error) {
       cleanup()
 
       // Cannot use `listenerCount` in node <= 0.12.
@@ -144,7 +144,7 @@ function stream(processor) {
         !emitter._events.error.length ||
         emitter._events.error === onerror
       ) {
-        throw err // Unhandled stream error in pipe.
+        throw error // Unhandled stream error in pipe.
       }
     }
   }

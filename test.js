@@ -77,8 +77,8 @@ test('createStream', function (t) {
         }
       })
     )
-      .on('error', function (err) {
-        st.equal(err, exception, 'should trigger `error` if an error occurs')
+      .on('error', function (error) {
+        st.equal(error, exception, 'should trigger `error` if an error occurs')
       })
       .on(
         'data',
@@ -97,9 +97,9 @@ test('createStream', function (t) {
         }
       })
     )
-      .on('warning', function (err) {
+      .on('warning', function (error) {
         st.equal(
-          err.reason,
+          error.reason,
           'alpha',
           'should trigger `warning` if an messages are emitted'
         )
@@ -137,8 +137,8 @@ test('createStream', function (t) {
       s.write('delta')
     }, 'should not `end` stdio streams')
 
-    tr = createStream(proc).on('error', function (err) {
-      st.equal(err.message, 'Whoops!', 'should pass errors')
+    tr = createStream(proc).on('error', function (error) {
+      st.equal(error.message, 'Whoops!', 'should pass errors')
     })
 
     tr.pipe(new stream.PassThrough())
