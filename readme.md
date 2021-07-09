@@ -27,11 +27,17 @@ npm install unified-stream
 The below example pipes stdin, into an HTML formatter, to stdout.
 
 ```js
-var stream = require('unified-stream')
-var rehype = require('rehype')
-var format = require('rehype-format')
+import {stream} from 'unified-stream'
+import {unified} from 'unified'
+import rehypeParse from 'rehype-parse'
+import rehypeFormat from 'rehype-format'
+import rehypeStringify from 'rehype-stringify'
 
-process.stdin.pipe(stream(rehype().use(format))).pipe(process.stdout)
+process.stdin
+  .pipe(
+    stream(unified().use(rehypeParse).use(rehypeFormat).use(rehypeStringify))
+  )
+  .pipe(process.stdout)
 ```
 
 ## API
