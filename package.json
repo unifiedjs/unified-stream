@@ -33,7 +33,7 @@
     "remark-cli": "^9.0.0",
     "remark-preset-wooorm": "^8.0.0",
     "tape": "^5.0.0",
-    "unified": "^9.0.0",
+    "unified": "^10.0.0-beta.1",
     "xo": "^0.39.0"
   },
   "scripts": {

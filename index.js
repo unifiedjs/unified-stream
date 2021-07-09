@@ -71,7 +71,7 @@ export function stream(processor) {
           emitter.emit('error', error)
         }, 4)
       } else {
-        emitter.emit('data', file.contents)
+        emitter.emit('data', file.value)
         emitter.emit('end')
       }
     }

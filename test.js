@@ -1,6 +1,6 @@
 import nodeStream from 'stream'
 import test from 'tape'
-import unified from 'unified'
+import {unified} from 'unified'
 import func from 'is-function'
 import {stream} from './index.js'
 
