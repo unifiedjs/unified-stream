@@ -111,7 +111,7 @@ export function stream(processor) {
             }
           }
 
-          if (error) {
+          if (error || !file) {
             // Don’t enter an infinite error throwing loop.
             setTimeout(() => {
               emitter.emit('error', error)
