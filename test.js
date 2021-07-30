@@ -7,7 +7,7 @@
  * @typedef {import('vfile-message').VFileMessage} VFileMessage
  */
 
-import nodeStream from 'stream'
+import nodeStream from 'node:stream'
 import test from 'tape'
 import {unified} from 'unified'
 import {stream} from './index.js'

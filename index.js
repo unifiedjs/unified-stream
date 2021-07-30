@@ -7,7 +7,7 @@
  * @typedef {Omit<NodeJS.ReadableStream & NodeJS.WritableStream, 'read'|'setEncoding'|'pause'|'resume'|'isPaused'|'unpipe'|'unshift'|'wrap'>} MinimalDuplex
  */
 
-import {EventEmitter} from 'events'
+import {EventEmitter} from 'node:events'
 
 /**
  * @param {Processor} processor
