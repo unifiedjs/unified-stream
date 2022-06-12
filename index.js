@@ -10,8 +10,12 @@
 import {EventEmitter} from 'node:events'
 
 /**
+ * Create a readable/writable stream that transforms with `processor`.
+ *
  * @param {Processor} processor
+ *   unified processor.
  * @returns {MinimalDuplex}
+ *   Duplex stream.
  */
 export function stream(processor) {
   /** @type {string[]} */
@@ -22,9 +26,12 @@ export function stream(processor) {
   /**
    * Write a chunk into memory.
    *
-   * @param {Value} chunk
-   * @param {Encoding} encoding
-   * @param {Callback} callback
+   * @param [chunk]
+   *   Chunk to write.
+   * @param [encoding]
+   *   Encoding to understand `chunk` as when it’s a buffer.
+   * @param [callback]
+   *   Callback called when written.
    */
   const write =
     /**
@@ -68,9 +75,12 @@ export function stream(processor) {
    * If messages are triggered during the process, those are triggerd as
    * `warning`s.
    *
-   * @param {Value} chunk
-   * @param {Encoding} encoding
-   * @param {Callback} callback
+   * @param [chunk]
+   *   Chunk to write.
+   * @param [encoding]
+   *   Encoding to understand `chunk` as when it’s a buffer.
+   * @param [callback]
+   *   Callback called when written.
    */
   const end =
     /**
@@ -142,10 +152,14 @@ export function stream(processor) {
    * size down.
    * See: <https://github.com/nodejs/node/blob/43a5170/lib/internal/streams/legacy.js#L13>.
    *
-   * @template {NodeJS.WritableStream} T
-   * @param {T} dest
+   * @template {NodeJS.WritableStream} Stream
+   *   Stream to write into.
+   * @param {Stream} dest
+   *   Stream to write into.
    * @param {{end?: boolean}} [options]
-   * @returns {T}
+   *   Configuration (optional).
+   * @returns {Stream}
+   *   Stream to write into.
    */
   function pipe(dest, options) {
     emitter.on('data', ondata)
@@ -182,6 +196,7 @@ export function stream(processor) {
      * Handle data.
      *
      * @param {Value} chunk
+     *   Data to write.
      * @returns {void}
      */
     function ondata(chunk) {
