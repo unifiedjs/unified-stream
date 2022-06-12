@@ -7,24 +7,43 @@
 [![Backers][backers-badge]][collective]
 [![Chat][chat-badge]][chat]
 
-Streaming interface to [unified][] processors.
+Streaming interface for [`unified`][unified].
 
-Note that the interface is streaming, but the code buffers.
+## Contents
+
+*   [What is this?](#what-is-this)
+*   [When should I use this?](#when-should-i-use-this)
+*   [Install](#install)
+*   [Use](#use)
+*   [API](#api)
+    *   [`stream(processor)`](#streamprocessor)
+*   [Types](#types)
+*   [Compatibility](#compatibility)
+*   [Contribute](#contribute)
+*   [License](#license)
+
+## What is this?
+
+This package turns a unified processor into a (duplex) Node.js stream.
+
+> 👉 **Note**: the interface is streaming but the code buffers.
+
+## When should I use this?
+
+You can use this if you have to use Node streams and are integrating with
+unified.
+As the code actually buffers, in almost all cases, you can use `unified` itself.
 
 ## Install
 
-This package is [ESM only](https://gist.github.com/sindresorhus/a39789f98801d908bbc7ff3ecc99d99c):
-Node 12+ is needed to use it and it must be `import`ed instead of `require`d.
-
-[npm][]:
+This package is [ESM only][esm].
+In Node.js (version 12.20+, 14.14+, 16.0+, or 18.0+), install with [npm][]:
 
 ```sh
 npm install unified-stream
 ```
 
 ## Use
-
-The below example pipes stdin, into an HTML formatter, to stdout.
 
 ```js
 import {stream} from 'unified-stream'
@@ -33,6 +52,7 @@ import rehypeParse from 'rehype-parse'
 import rehypeFormat from 'rehype-format'
 import rehypeStringify from 'rehype-stringify'
 
+// Pipe stdin, into an HTML formatter, to stdout.
 process.stdin
   .pipe(
     stream(unified().use(rehypeParse).use(rehypeFormat).use(rehypeStringify))
@@ -42,12 +62,24 @@ process.stdin
 
 ## API
 
-This package exports the following identifiers: `stream`.
+This package exports the identifier `stream`.
 There is no default export.
 
 ### `stream(processor)`
 
-Create a readable/writable stream that transforms with `processor`.
+Create a duplex (readable/writable) Node.js stream that transforms with `processor`.
+
+## Types
+
+This package is fully typed with [TypeScript][].
+It exports the additional type `MinimalDuplex`.
+
+## Compatibility
+
+Projects maintained by the unified collective are compatible with all maintained
+versions of Node.js.
+As of now, that is Node.js 12.20+, 14.14+, 16.0+, and 18.0+.
+Our projects sometimes work with older versions, but this is not guaranteed.
 
 ## Contribute
 
@@ -89,13 +121,17 @@ abide by its terms.
 
 [npm]: https://docs.npmjs.com/cli/install
 
+[esm]: https://gist.github.com/sindresorhus/a39789f98801d908bbc7ff3ecc99d99c
+
+[typescript]: https://www.typescriptlang.org
+
 [health]: https://github.com/unifiedjs/.github
 
-[contributing]: https://github.com/unifiedjs/.github/blob/HEAD/contributing.md
+[contributing]: https://github.com/unifiedjs/.github/blob/main/contributing.md
 
-[support]: https://github.com/unifiedjs/.github/blob/HEAD/support.md
+[support]: https://github.com/unifiedjs/.github/blob/main/support.md
 
-[coc]: https://github.com/unifiedjs/.github/blob/HEAD/code-of-conduct.md
+[coc]: https://github.com/unifiedjs/.github/blob/main/code-of-conduct.md
 
 [license]: license
 
