@@ -49,7 +49,6 @@ export function stream(processor) {
           throw new Error('Did not expect `write` after `end`')
         }
 
-        // @ts-expect-error: passing `encoding` to string is fine.
         chunks.push((chunk || '').toString(encoding || 'utf8'))
 
         if (callback) {

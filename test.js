@@ -7,6 +7,7 @@
  * @typedef {import('vfile-message').VFileMessage} VFileMessage
  */
 
+import {Buffer} from 'node:buffer'
 import nodeStream from 'node:stream'
 import test from 'tape'
 import {unified} from 'unified'
