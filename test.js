@@ -8,7 +8,6 @@
  */
 
 import assert from 'node:assert/strict'
-import {Buffer} from 'node:buffer'
 import nodeStream from 'node:stream'
 import test from 'node:test'
 import {unified} from 'unified'
@@ -77,13 +76,71 @@ test('#end and #write', async function (t) {
   await t.test('should honour encoding', async function () {
     let called = false
 
-    // @ts-expect-error: TS is wrong on streams.
-    stream(proc)
-      .on('data', function (/** @type {string} */ value) {
-        assert.equal(value, 'brC!vo')
-        called = true
-      })
-      .end(Buffer.from([0x62, 0x72, 0xc3, 0xa1, 0x76, 0x6f]), 'ascii')
+    const s = stream(proc)
+
+    s.on('data', function (/** @type {string} */ value) {
+      assert.equal(value, 'abc')
+      called = true
+    })
+
+    // @ts-expect-error: TS is wrong on encoding.
+    s.end(new Uint8Array([0x61, 0x00, 0x62, 0x00, 0x63, 0x00]), 'utf-16le')
+
+    assert.equal(called, true)
+  })
+
+  await t.test('should support separate typed arrays', async function () {
+    let called = false
+
+    const tr = stream(proc).on('data', function (/** @type {string} */ value) {
+      assert.equal(value, '€')
+      called = true
+    })
+
+    tr.write(new Uint8Array([0xe2]))
+    tr.write(new Uint8Array([0x82]))
+    tr.write(new Uint8Array([0xac]))
+    tr.end()
+
+    assert.equal(called, true)
+  })
+
+  await t.test('should support separate typed arrays', async function () {
+    const family = '👨‍👨‍👧‍👦'
+    let called = false
+
+    const tr = stream(proc).on('data', function (/** @type {string} */ value) {
+      assert.equal(value, family)
+      called = true
+    })
+
+    let index = -1
+
+    while (++index < family.length) {
+      tr.write(family.slice(index, index + 1))
+    }
+
+    tr.end()
+
+    assert.equal(called, true)
+  })
+
+  await t.test('should support mixed data', async function () {
+    let called = false
+
+    const tr = stream(proc).on('data', function (/** @type {string} */ value) {
+      assert.equal(value, 'abcd')
+      called = true
+    })
+
+    // @ts-expect-error: TS is wrong on encoding.
+    tr.write(new Uint8Array([0x61, 0x00]), 'utf-16le')
+    // @ts-expect-error: TS is wrong on encoding.
+    tr.write(new Uint8Array([0x00, 0x62]), 'utf-16be')
+    // @ts-expect-error: TS is wrong on encoding.
+    tr.write(new Uint8Array([0x63]), 'unicode-1-1-utf-8')
+    tr.write('d')
+    tr.end()
 
     assert.equal(called, true)
   })
@@ -96,7 +153,7 @@ test('#end and #write', async function (t) {
         assert.equal(value, 'brávo')
         called = true
       })
-      .end(Buffer.from([0x62, 0x72, 0xc3, 0xa1, 0x76, 0x6f]))
+      .end(new Uint8Array([0x62, 0x72, 0xc3, 0xa1, 0x76, 0x6f]))
 
     assert.equal(called, true)
   })
@@ -274,10 +331,16 @@ test('#pipe', async function (t) {
       const tr = stream(proc)
 
       tr.pipe(new nodeStream.PassThrough())
-        .on('data', function (/** @type {Buffer} */ buf) {
-          assert.equal(String(buf), 'alphabravocharlie')
-          called = true
-        })
+        .on(
+          'data',
+          /**
+           * @param {import('node:buffer').Buffer} buf
+           */
+          function (buf) {
+            assert.equal(String(buf), 'alphabravocharlie')
+            called = true
+          }
+        )
         .on('error', function () {
           assert.fail()
         })
