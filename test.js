@@ -7,31 +7,29 @@
  * @typedef {import('vfile-message').VFileMessage} VFileMessage
  */
 
+import assert from 'node:assert/strict'
 import {Buffer} from 'node:buffer'
 import nodeStream from 'node:stream'
-import test from 'tape'
+import test from 'node:test'
 import {unified} from 'unified'
 import {stream} from './index.js'
 
-test('stream', (t) => {
+test('stream', async (t) => {
   const proc = unified().use(parse).use(stringify)
 
-  t.test('interface', (st) => {
+  await t.test('interface', () => {
     const tr = stream(proc)
-    st.equal(tr.readable, true, 'should be readable')
-    st.equal(tr.writable, true, 'should be writable')
-    st.equal(typeof tr.write, 'function', 'should have a `write` method')
-    st.equal(typeof tr.end, 'function', 'should have an `end` method')
-    st.equal(typeof tr.pipe, 'function', 'should have a `pipe` method')
-    st.end()
+    assert.equal(tr.readable, true, 'should be readable')
+    assert.equal(tr.writable, true, 'should be writable')
+    assert.equal(typeof tr.write, 'function', 'should have a `write` method')
+    assert.equal(typeof tr.end, 'function', 'should have an `end` method')
+    assert.equal(typeof tr.pipe, 'function', 'should have a `pipe` method')
   })
 
-  t.test('#end and #write', (st) => {
-    st.plan(10)
+  await t.test('#end and #write', async () => {
+    assert.equal(stream(proc).end(), true, 'should return true')
 
-    st.equal(stream(proc).end(), true, 'should return true')
-
-    st.throws(
+    assert.throws(
       () => {
         const tr = stream(proc)
         tr.end()
@@ -43,20 +41,20 @@ test('stream', (t) => {
 
     stream(proc)
       .on('data', (/** @type {string} */ value) => {
-        st.equal(value, '', 'should emit processed `data`')
+        assert.equal(value, '', 'should emit processed `data`')
       })
       .end()
 
     stream(proc)
       .on('data', (/** @type {string} */ value) => {
-        st.equal(value, 'alpha', 'should emit given `data`')
+        assert.equal(value, 'alpha', 'should emit given `data`')
       })
       .end('alpha')
 
     // @ts-expect-error: TS is wrong on streams.
     stream(proc)
       .on('data', (/** @type {string} */ value) => {
-        st.equal(value, 'brC!vo', 'should honour encoding')
+        assert.equal(value, 'brC!vo', 'should honour encoding')
       })
       .end(Buffer.from([0x62, 0x72, 0xc3, 0xa1, 0x76, 0x6f]), 'ascii')
 
@@ -64,11 +62,11 @@ test('stream', (t) => {
 
     stream(proc)
       .on('data', () => {
-        st.equal(phase, 1, 'should trigger data after callback')
+        assert.equal(phase, 1, 'should trigger data after callback')
         phase++
       })
       .end('charlie', () => {
-        st.equal(phase, 0, 'should trigger callback before data')
+        assert.equal(phase, 0, 'should trigger callback before data')
         phase++
       })
 
@@ -84,13 +82,17 @@ test('stream', (t) => {
       })
     )
       .on('error', (/** @type {Error} */ error) => {
-        st.equal(error, exception, 'should trigger `error` if an error occurs')
+        assert.equal(
+          error,
+          exception,
+          'should trigger `error` if an error occurs'
+        )
       })
       .on(
         'data',
         /* istanbul ignore next */
         () => {
-          st.fail('should not trigger `data` if an error occurs')
+          assert.fail('should not trigger `data` if an error occurs')
         }
       )
       .end()
@@ -105,22 +107,20 @@ test('stream', (t) => {
       })
     )
       .on('warning', (/** @type {VFileMessage} */ error) => {
-        st.equal(
+        assert.equal(
           error.reason,
           'alpha',
           'should trigger `warning` if an messages are emitted'
         )
       })
       .on('data', (/** @type {string} */ data) => {
-        st.equal(data, '', 'should not fail if warnings are emitted')
+        assert.equal(data, '', 'should noassert.fail if warnings are emitted')
       })
       .end()
   })
 
-  t.test('#pipe', (st) => {
-    st.plan(6)
-
-    st.doesNotThrow(() => {
+  await t.test('#pipe', async () => {
+    assert.doesNotThrow(() => {
       // Not writable.
       const tr = stream(proc)
       // @ts-expect-error: we handle this gracefully.
@@ -137,7 +137,7 @@ test('stream', (t) => {
 
     tr.end('alpha')
 
-    st.doesNotThrow(() => {
+    assert.doesNotThrow(() => {
       s.write('bravo')
     }, 'should not `end` stdio streams')
 
@@ -147,12 +147,12 @@ test('stream', (t) => {
     tr.pipe(s, {end: false})
     tr.end('alpha')
 
-    st.doesNotThrow(() => {
+    assert.doesNotThrow(() => {
       s.write('bravo')
     }, 'should not `end` streams when piping w/ `end: false`')
 
     tr = stream(proc).on('error', (/** @type {Error} */ error) => {
-      st.equal(error.message, 'Whoops!', 'should pass errors')
+      assert.equal(error.message, 'Whoops!', 'should pass errors')
     })
 
     tr.pipe(new nodeStream.PassThrough())
@@ -161,7 +161,7 @@ test('stream', (t) => {
     tr = stream(proc)
     tr.pipe(new nodeStream.PassThrough())
 
-    st.throws(
+    assert.throws(
       () => {
         tr.emit('error', new Error('Whoops!'))
       },
@@ -173,7 +173,7 @@ test('stream', (t) => {
 
     tr.pipe(new nodeStream.PassThrough())
       .on('data', (/** @type {Buffer} */ buf) => {
-        st.equal(
+        assert.equal(
           String(buf),
           'alphabravocharlie',
           'should trigger `data` with the processed result'
@@ -183,7 +183,7 @@ test('stream', (t) => {
         'error',
         /* istanbul ignore next */
         () => {
-          st.fail('should not trigger `error`')
+          assert.fail('should not trigger `error`')
         }
       )
 
