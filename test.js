@@ -195,7 +195,6 @@ test('stream', async (t) => {
 function parse() {
   /** @type {Processor} */
   // @ts-expect-error: TS is wrong about `this`.
-  // eslint-disable-next-line unicorn/no-this-assignment
   const self = this
 
   self.parser = parser
@@ -214,7 +213,6 @@ function parse() {
 function stringify() {
   /** @type {Processor} */
   // @ts-expect-error: TS is wrong about `this`.
-  // eslint-disable-next-line unicorn/no-this-assignment
   const self = this
 
   self.compiler = compiler

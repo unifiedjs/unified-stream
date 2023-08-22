@@ -6,7 +6,7 @@
     "emitDeclarationOnly": true,
     "exactOptionalPropertyTypes": true,
     "lib": ["es2020"],
-    "module": "node16",
+    "module": "nodenext",
     "strict": true,
     "target": "es2020"
   },
