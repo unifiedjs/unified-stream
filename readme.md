@@ -47,14 +47,14 @@ npm install unified-stream
 In Deno with [`esm.sh`][esm-sh]:
 
 ```js
-import {stream} from 'https://esm.sh/unified-stream@2'
+import {stream} from 'https://esm.sh/unified-stream@3'
 ```
 
 In browsers with [`esm.sh`][esm-sh]:
 
 ```html
 <script type="module">
-  import {stream} from 'https://esm.sh/unified-stream@2?bundle'
+  import {stream} from 'https://esm.sh/unified-stream@3?bundle'
 </script>
 ```
 
