@@ -11,13 +11,15 @@ import assert from 'node:assert/strict'
 import nodeStream from 'node:stream'
 import test from 'node:test'
 import {unified} from 'unified'
-import {stream} from './index.js'
+import {stream} from 'unified-stream'
 
 const proc = unified().use(parse).use(stringify)
 
 test('unified-stream', async function (t) {
   await t.test('should expose the public api', async function () {
-    assert.deepEqual(Object.keys(await import('./index.js')).sort(), ['stream'])
+    assert.deepEqual(Object.keys(await import('unified-stream')).sort(), [
+      'stream'
+    ])
   })
 
   const tr = stream(proc)
