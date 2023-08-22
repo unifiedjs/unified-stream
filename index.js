@@ -1,7 +1,6 @@
 /**
  * @typedef {import('unified').Processor} Processor
  * @typedef {import('unified').ProcessCallback} ProcessCallback
- * @typedef {import('vfile').BufferEncoding} Encoding
  * @typedef {import('vfile').VFileValue} Value
  * @typedef {((error?: Error) => void)} Callback
  * @typedef {Omit<NodeJS.ReadableStream & NodeJS.WritableStream, 'read'|'setEncoding'|'pause'|'resume'|'isPaused'|'unpipe'|'unshift'|'wrap'>} MinimalDuplex
@@ -36,14 +35,14 @@ export function stream(processor) {
   const write =
     /**
      * @type {(
-     *   ((value?: Value, encoding?: Encoding, callback?: Callback) => boolean) &
+     *   ((value?: Value, encoding?: string, callback?: Callback) => boolean) &
      *   ((value: Value, callback?: Callback) => boolean)
      * )}
      */
     (
       /**
        * @param {Value} [chunk]
-       * @param {Encoding} [encoding]
+       * @param {string} [encoding]
        * @param {Callback} [callback]
        */
       function (chunk, encoding, callback) {
@@ -56,6 +55,8 @@ export function stream(processor) {
           throw new Error('Did not expect `write` after `end`')
         }
 
+        // To do: improve writnig, I think there’s a Node textencoder example somewhere.
+        // @ts-expect-error: `encoding` is fine on buffers.
         chunks.push((chunk || '').toString(encoding || 'utf8'))
 
         if (callback) {
@@ -85,14 +86,14 @@ export function stream(processor) {
   const end =
     /**
      * @type {(
-     *   ((value?: Value, encoding?: Encoding, callback?: Callback) => boolean) &
+     *   ((value?: Value, encoding?: string, callback?: Callback) => boolean) &
      *   ((value: Value, callback?: Callback) => boolean)
      * )}
      */
     (
       /**
        * @param {Value} [chunk]
-       * @param {Encoding} [encoding]
+       * @param {string} [encoding]
        * @param {Callback} [callback]
        */
       function (chunk, encoding, callback) {

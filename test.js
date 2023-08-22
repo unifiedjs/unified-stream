@@ -1,9 +1,9 @@
 /**
+ * @typedef {import('unist').Literal} Literal
+ * @typedef {import('unist').Node} Node
+ *
  * @typedef {import('unified').Processor} Processor
- * @typedef {import('unified').Plugin} Plugin
- * @typedef {import('unified').Transformer} Transformer
- * @typedef {import('unified').ParserFunction} ParserFunction
- * @typedef {import('unified').CompilerFunction} CompilerFunction
+ *
  * @typedef {import('vfile-message').VFileMessage} VFileMessage
  */
 
@@ -74,9 +74,7 @@ test('stream', async (t) => {
 
     stream(
       proc().use(() => {
-        return transformer
-        /** @type {Transformer} */
-        function transformer() {
+        return function () {
           return exception
         }
       })
@@ -99,9 +97,7 @@ test('stream', async (t) => {
 
     stream(
       proc().use(() => {
-        return transformer
-        /** @type {Transformer} */
-        function transformer(_, file) {
+        return function (_, file) {
           file.message(exception)
         }
       })
@@ -194,29 +190,37 @@ test('stream', async (t) => {
 })
 
 /**
- * @type {Plugin}
- * @this {Processor}
+ * @type {import('unified').Plugin<[], string, Node>}
  */
 function parse() {
-  this.Parser = parser
+  /** @type {Processor} */
+  // @ts-expect-error: TS is wrong about `this`.
+  // eslint-disable-next-line unicorn/no-this-assignment
+  const self = this
 
-  /** @type {ParserFunction} */
+  self.parser = parser
+
+  /** @type {import('unified').Parser<Node>} */
   function parser(doc) {
-    // @ts-expect-error: hush.
-    return {type: 'text', value: doc}
+    /** @type {Literal} */
+    const literal = {type: 'text', value: doc}
+    return literal
   }
 }
 
 /**
- * @type {Plugin}
- * @this {Processor}
+ * @type {import('unified').Plugin<[], Node, string>}
  */
 function stringify() {
-  this.Compiler = compiler
+  /** @type {Processor} */
+  // @ts-expect-error: TS is wrong about `this`.
+  // eslint-disable-next-line unicorn/no-this-assignment
+  const self = this
 
-  /** @type {CompilerFunction} */
-  function compiler(tree) {
-    // @ts-expect-error: it’s a text node.
-    return tree.value
+  self.compiler = compiler
+
+  /** @type {import('unified').Compiler<Node, string>} */
+  function compiler(node) {
+    return 'value' in node ? String(node.value) : ''
   }
 }
