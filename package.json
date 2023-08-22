@@ -4,8 +4,8 @@
   "description": "Streaming interface for unified processors",
   "license": "MIT",
   "keywords": [
-    "unified",
-    "stream"
+    "stream",
+    "unified"
   ],
   "repository": "unifiedjs/unified-stream",
   "bugs": "https://github.com/unifiedjs/unified-stream/issues",

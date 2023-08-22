@@ -17,6 +17,7 @@ Streaming interface for [`unified`][unified].
 *   [Use](#use)
 *   [API](#api)
     *   [`stream(processor)`](#streamprocessor)
+    *   [`MinimalDuplex`](#minimalduplex)
 *   [Types](#types)
 *   [Compatibility](#compatibility)
 *   [Contribute](#contribute)
@@ -37,20 +38,35 @@ As the code actually buffers, in almost all cases, you can use `unified` itself.
 ## Install
 
 This package is [ESM only][esm].
-In Node.js (version 12.20+, 14.14+, 16.0+, or 18.0+), install with [npm][]:
+In Node.js (version 16+), install with [npm][]:
 
 ```sh
 npm install unified-stream
 ```
 
+In Deno with [`esm.sh`][esm-sh]:
+
+```js
+import {stream} from 'https://esm.sh/unified-stream@2'
+```
+
+In browsers with [`esm.sh`][esm-sh]:
+
+```html
+<script type="module">
+  import {stream} from 'https://esm.sh/unified-stream@2?bundle'
+</script>
+```
+
 ## Use
 
 ```js
-import {stream} from 'unified-stream'
-import {unified} from 'unified'
-import rehypeParse from 'rehype-parse'
+import process from 'node:process'
 import rehypeFormat from 'rehype-format'
+import rehypeParse from 'rehype-parse'
 import rehypeStringify from 'rehype-stringify'
+import {unified} from 'unified'
+import {stream} from 'unified-stream'
 
 // Pipe stdin, into an HTML formatter, to stdout.
 process.stdin
@@ -62,24 +78,41 @@ process.stdin
 
 ## API
 
-This package exports the identifier `stream`.
+This package exports the identifier [`stream`][api-stream].
 There is no default export.
 
 ### `stream(processor)`
 
-Create a duplex (readable/writable) Node.js stream that transforms with `processor`.
+Create a duplex (readable and writable) stream that transforms with
+`processor`.
+
+###### Parameters
+
+*   `processor` ([`Processor`][processor])
+    — unified processor
+
+###### Returns
+
+Duplex stream ([`MinimalDuplex`][api-minimal-duplex]).
+
+### `MinimalDuplex`
+
+Simple readable and writable ([duplex][]) stream (TypeScript type).
 
 ## Types
 
 This package is fully typed with [TypeScript][].
-It exports the additional type `MinimalDuplex`.
+It exports the additional type [`MinimalDuplex`][api-minimal-duplex].
 
 ## Compatibility
 
-Projects maintained by the unified collective are compatible with all maintained
+Projects maintained by the unified collective are compatible with maintained
 versions of Node.js.
-As of now, that is Node.js 12.20+, 14.14+, 16.0+, and 18.0+.
-Our projects sometimes work with older versions, but this is not guaranteed.
+
+When we cut a new major release, we drop support for unmaintained versions of
+Node.
+This means we try to keep the current release line, `unified-stream@^2`,
+compatible with Node.js 12.
 
 ## Contribute
 
@@ -123,6 +156,8 @@ abide by its terms.
 
 [esm]: https://gist.github.com/sindresorhus/a39789f98801d908bbc7ff3ecc99d99c
 
+[esm-sh]: https://esm.sh
+
 [typescript]: https://www.typescriptlang.org
 
 [health]: https://github.com/unifiedjs/.github
@@ -138,3 +173,11 @@ abide by its terms.
 [author]: https://wooorm.com
 
 [unified]: https://github.com/unifiedjs/unified
+
+[processor]: https://github.com/unifiedjs/unified#processor
+
+[duplex]: https://nodejs.org/api/stream.html#class-streamduplex
+
+[api-stream]: #streamprocessor
+
+[api-minimal-duplex]: #minimalduplex
