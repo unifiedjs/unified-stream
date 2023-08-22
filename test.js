@@ -14,118 +14,209 @@ import test from 'node:test'
 import {unified} from 'unified'
 import {stream} from './index.js'
 
-test('stream', async (t) => {
-  const proc = unified().use(parse).use(stringify)
+const proc = unified().use(parse).use(stringify)
 
-  await t.test('interface', () => {
-    const tr = stream(proc)
-    assert.equal(tr.readable, true, 'should be readable')
-    assert.equal(tr.writable, true, 'should be writable')
-    assert.equal(typeof tr.write, 'function', 'should have a `write` method')
-    assert.equal(typeof tr.end, 'function', 'should have an `end` method')
-    assert.equal(typeof tr.pipe, 'function', 'should have a `pipe` method')
+test('unified-stream', async function (t) {
+  await t.test('should expose the public api', async function () {
+    assert.deepEqual(Object.keys(await import('./index.js')).sort(), ['stream'])
   })
 
-  await t.test('#end and #write', async () => {
-    assert.equal(stream(proc).end(), true, 'should return true')
+  const tr = stream(proc)
 
-    assert.throws(
-      () => {
-        const tr = stream(proc)
-        tr.end()
-        tr.end()
-      },
-      /^Error: Did not expect `write` after `end`$/,
-      'should throw on end after end'
-    )
+  await t.test('should be readable', async function () {
+    assert.equal(tr.readable, true)
+  })
+
+  await t.test('should be writable', async function () {
+    assert.equal(tr.writable, true)
+  })
+})
+
+test('#end and #write', async function (t) {
+  const exception = new Error('alpha')
+
+  await t.test('should return `true`', async function () {
+    assert.equal(stream(proc).end(), true)
+  })
+
+  await t.test('should throw on end after end', async function () {
+    const tr = stream(proc)
+    tr.end()
+
+    assert.throws(function () {
+      tr.end()
+    }, /^Error: Did not expect `write` after `end`$/)
+  })
+
+  await t.test('should emit processed `data`', async function () {
+    let called = false
 
     stream(proc)
-      .on('data', (/** @type {string} */ value) => {
-        assert.equal(value, '', 'should emit processed `data`')
+      .on('data', function (/** @type {string} */ value) {
+        assert.equal(value, '')
+        called = true
       })
       .end()
 
+    assert.equal(called, true)
+  })
+
+  await t.test('should emit given `data`', async function () {
+    let called = false
+
     stream(proc)
-      .on('data', (/** @type {string} */ value) => {
-        assert.equal(value, 'alpha', 'should emit given `data`')
+      .on('data', function (/** @type {string} */ value) {
+        assert.equal(value, 'alpha')
+        called = true
       })
       .end('alpha')
 
+    assert.equal(called, true)
+  })
+
+  await t.test('should honour encoding', async function () {
+    let called = false
+
     // @ts-expect-error: TS is wrong on streams.
     stream(proc)
-      .on('data', (/** @type {string} */ value) => {
-        assert.equal(value, 'brC!vo', 'should honour encoding')
+      .on('data', function (/** @type {string} */ value) {
+        assert.equal(value, 'brC!vo')
+        called = true
       })
       .end(Buffer.from([0x62, 0x72, 0xc3, 0xa1, 0x76, 0x6f]), 'ascii')
 
+    assert.equal(called, true)
+  })
+
+  await t.test('should default to `utf8`', async function () {
+    let called = false
+
+    stream(proc)
+      .on('data', function (/** @type {string} */ value) {
+        assert.equal(value, 'brávo')
+        called = true
+      })
+      .end(Buffer.from([0x62, 0x72, 0xc3, 0xa1, 0x76, 0x6f]))
+
+    assert.equal(called, true)
+  })
+
+  await t.test('should trigger callback before data', async function () {
     let phase = 0
 
     stream(proc)
-      .on('data', () => {
-        assert.equal(phase, 1, 'should trigger data after callback')
+      .on('data', function () {
+        assert.equal(phase, 1)
         phase++
       })
-      .end('charlie', () => {
-        assert.equal(phase, 0, 'should trigger callback before data')
+      .end('charlie', function () {
+        assert.equal(phase, 0)
         phase++
       })
 
-    const exception = new Error('alpha')
-
-    stream(
-      proc().use(() => {
-        return function () {
-          return exception
-        }
-      })
-    )
-      .on('error', (/** @type {Error} */ error) => {
-        assert.equal(
-          error,
-          exception,
-          'should trigger `error` if an error occurs'
-        )
-      })
-      .on(
-        'data',
-        /* istanbul ignore next */
-        () => {
-          assert.fail('should not trigger `data` if an error occurs')
-        }
-      )
-      .end()
-
-    stream(
-      proc().use(() => {
-        return function (_, file) {
-          file.message(exception)
-        }
-      })
-    )
-      .on('warning', (/** @type {VFileMessage} */ error) => {
-        assert.equal(
-          error.reason,
-          'alpha',
-          'should trigger `warning` if an messages are emitted'
-        )
-      })
-      .on('data', (/** @type {string} */ data) => {
-        assert.equal(data, '', 'should noassert.fail if warnings are emitted')
-      })
-      .end()
+    assert.equal(phase, 2)
   })
 
-  await t.test('#pipe', async () => {
-    assert.doesNotThrow(() => {
+  await t.test('should trigger `error` if an error occurs', async function () {
+    await new Promise(function (resolve) {
+      stream(
+        proc().use(function () {
+          return function () {
+            return exception
+          }
+        })
+      )
+        .on('error', function (/** @type {Error} */ error) {
+          assert.equal(error, exception)
+          resolve(undefined)
+        })
+        .on('data', function () {
+          assert.fail()
+        })
+        .end()
+    })
+  })
+
+  await t.test(
+    'should trigger `warning` if an messages are emitted',
+    async function () {
+      let called = false
+
+      stream(
+        proc().use(function () {
+          return function (_, file) {
+            file.message(exception)
+          }
+        })
+      )
+        .on('warning', function (/** @type {VFileMessage} */ error) {
+          assert.equal(error.reason, 'alpha')
+          called = true
+        })
+        .on('data', function (/** @type {string} */ data) {
+          assert.equal(data, '')
+        })
+        .end()
+
+      assert.equal(called, true)
+    }
+  )
+
+  await t.test('should support a callback for `write`', async function () {
+    let phase = 0
+
+    const s = stream(proc).on('data', function (/** @type {string} */ data) {
+      assert.equal(data, 'x')
+      assert.equal(phase, 1)
+      phase++
+    })
+
+    s.write('x', function () {
+      assert.equal(phase, 0)
+      phase++
+    })
+
+    s.end()
+
+    assert.equal(phase, 2)
+  })
+
+  await t.test('should support just a callback for `end`', async function () {
+    let phase = 0
+
+    stream(proc)
+      .on('data', function (/** @type {string} */ data) {
+        assert.equal(data, '')
+        assert.equal(phase, 1)
+        phase++
+      })
+      .end(function () {
+        assert.equal(phase, 0)
+        phase++
+      })
+
+    assert.equal(phase, 2)
+  })
+})
+
+test('#pipe', async function (t) {
+  await t.test(
+    'should not throw when piping to a non-writable stream',
+    async function () {
       // Not writable.
       const tr = stream(proc)
       // @ts-expect-error: we handle this gracefully.
       tr.pipe(new nodeStream.Readable())
-      tr.end('foo')
-    }, 'should not throw when piping to a non-writable stream')
 
-    let tr = stream(proc)
-    let s = new nodeStream.PassThrough()
+      assert.doesNotThrow(function () {
+        tr.end('foo')
+      })
+    }
+  )
+
+  await t.test('should not `end` stdio streams', async function () {
+    const tr = stream(proc)
+    const s = new nodeStream.PassThrough()
     // @ts-expect-error: TS is wrong about stdin and stdout.
     s._isStdio = true
 
@@ -133,60 +224,71 @@ test('stream', async (t) => {
 
     tr.end('alpha')
 
-    assert.doesNotThrow(() => {
+    assert.doesNotThrow(function () {
       s.write('bravo')
-    }, 'should not `end` stdio streams')
+    })
+  })
 
-    tr = stream(proc)
-    s = new nodeStream.PassThrough()
+  await t.test(
+    'should not `end` streams when piping w/ `end: false`',
+    async function () {
+      const tr = stream(proc)
+      const s = new nodeStream.PassThrough()
 
-    tr.pipe(s, {end: false})
-    tr.end('alpha')
+      tr.pipe(s, {end: false})
+      tr.end('alpha')
 
-    assert.doesNotThrow(() => {
-      s.write('bravo')
-    }, 'should not `end` streams when piping w/ `end: false`')
+      assert.doesNotThrow(function () {
+        s.write('bravo')
+      })
+    }
+  )
 
-    tr = stream(proc).on('error', (/** @type {Error} */ error) => {
-      assert.equal(error.message, 'Whoops!', 'should pass errors')
+  await t.test('should pass errors', async function () {
+    let called = false
+
+    const tr = stream(proc).on('error', function (/** @type {Error} */ error) {
+      assert.equal(error.message, 'Whoops!')
+      called = true
     })
 
     tr.pipe(new nodeStream.PassThrough())
     tr.emit('error', new Error('Whoops!'))
 
-    tr = stream(proc)
-    tr.pipe(new nodeStream.PassThrough())
-
-    assert.throws(
-      () => {
-        tr.emit('error', new Error('Whoops!'))
-      },
-      /Whoops!/,
-      'should throw if errors are not listened to'
-    )
-
-    tr = stream(proc)
-
-    tr.pipe(new nodeStream.PassThrough())
-      .on('data', (/** @type {Buffer} */ buf) => {
-        assert.equal(
-          String(buf),
-          'alphabravocharlie',
-          'should trigger `data` with the processed result'
-        )
-      })
-      .on(
-        'error',
-        /* istanbul ignore next */
-        () => {
-          assert.fail('should not trigger `error`')
-        }
-      )
-
-    tr.write('alpha')
-    tr.write('bravo')
-    tr.end('charlie')
+    assert.equal(called, true)
   })
+
+  await t.test('should throw if errors are not listened to', async function () {
+    const tr = stream(proc)
+    tr.pipe(new nodeStream.PassThrough())
+
+    assert.throws(function () {
+      tr.emit('error', new Error('Whoops!'))
+    }, /Whoops!/)
+  })
+
+  await t.test(
+    'should trigger `data` with the processed result',
+    async function () {
+      let called = false
+      const tr = stream(proc)
+
+      tr.pipe(new nodeStream.PassThrough())
+        .on('data', function (/** @type {Buffer} */ buf) {
+          assert.equal(String(buf), 'alphabravocharlie')
+          called = true
+        })
+        .on('error', function () {
+          assert.fail()
+        })
+
+      tr.write('alpha')
+      tr.write('bravo')
+      tr.end('charlie')
+
+      assert.equal(called, true)
+    }
+  )
 })
 
 /**
