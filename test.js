@@ -14,7 +14,6 @@ import {unified} from 'unified'
 import {stream} from './index.js'
 
 test('stream', (t) => {
-  // @ts-expect-error: unified types are wrong.
   const proc = unified().use(parse).use(stringify)
 
   t.test('interface', (st) => {
